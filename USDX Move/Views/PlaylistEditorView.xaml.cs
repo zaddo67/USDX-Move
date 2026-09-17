@@ -65,6 +65,7 @@ namespace USDX_Move.Views
             foreach (var song in scanned) _songs.Add(song);
             UpdatePlaylistMarkers();
             _songsView.Refresh();
+            UpdateSongCount();
             TxtStatus.Text = $"Loaded {_songs.Count} songs.";
         }
 
@@ -165,6 +166,12 @@ namespace USDX_Move.Views
             catch (Exception ex) { ShowWarning(ex.Message); }
         }
         private void BtnStop_Click(object sender, RoutedEventArgs e) { _preview.Stop(); TxtStatus.Text = "Playback stopped."; }
+        private void BtnSkipForward_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedSong == null) { ShowWarning("Select a song first."); return; }
+            _preview.SkipForward(TimeSpan.FromSeconds(10));
+            TxtStatus.Text = "Advanced preview by 10 seconds.";
+        }
 
         private void BtnBrowseSongs_Click(object sender, RoutedEventArgs e) => BrowseFolder(TxtSongsFolder, "Select Songs Folder");
         private void BtnBrowsePlaylists_Click(object sender, RoutedEventArgs e) => BrowseFolder(TxtPlaylistsFolder, "Select Playlists Folder");
@@ -180,11 +187,16 @@ namespace USDX_Move.Views
         private bool MatchesSongSearch(object item) => Matches(item as PlaylistSongItem, TxtSongSearch?.Text);
         private bool MatchesPlaylistSearch(object item) => Matches(item as PlaylistSongItem, TxtPlaylistSearch?.Text);
         private static bool Matches(PlaylistSongItem? song, string? search) => song != null && (string.IsNullOrWhiteSpace(search) || song.Artist.Contains(search.Trim(), StringComparison.OrdinalIgnoreCase) || song.Title.Contains(search.Trim(), StringComparison.OrdinalIgnoreCase));
-        private void TxtSongSearch_TextChanged(object sender, TextChangedEventArgs e) => _songsView?.Refresh();
+        private void TxtSongSearch_TextChanged(object sender, TextChangedEventArgs e) { _songsView?.Refresh(); UpdateSongCount(); }
         private void TxtPlaylistSearch_TextChanged(object sender, TextChangedEventArgs e) => _playlistView?.Refresh();
         private void BtnClearSongSearch_Click(object sender, RoutedEventArgs e) => TxtSongSearch.Text = string.Empty;
         private void BtnClearPlaylistSearch_Click(object sender, RoutedEventArgs e) => TxtPlaylistSearch.Text = string.Empty;
         private void UpdatePlaylistMarkers() { var entries = _playlistSongs.Select(s => s.PlaylistEntry).ToHashSet(StringComparer.OrdinalIgnoreCase); foreach (var song in _songs) song.IsInPlaylist = entries.Contains(song.PlaylistEntry); TxtPlaylistCount.Text = $"{_playlistSongs.Count} song{(_playlistSongs.Count == 1 ? "" : "s")}"; }
+        private void UpdateSongCount()
+        {
+            int visible = _songs.Count(MatchesSongSearch);
+            TxtSongCount.Text = visible == _songs.Count ? $"{visible} songs" : $"{visible} of {_songs.Count} songs";
+        }
         private void BtnBack_Click(object sender, RoutedEventArgs e) { _preview.Stop(); BackRequested?.Invoke(this, EventArgs.Empty); }
         private static void ShowWarning(string message) => MessageBox.Show(message, "Playlist Editor", MessageBoxButton.OK, MessageBoxImage.Warning);
     }

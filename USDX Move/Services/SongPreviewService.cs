@@ -16,5 +16,11 @@ namespace USDX_Move.Services
         }
 
         public void Stop() => _player.Stop();
+
+        public void SkipForward(TimeSpan amount)
+        {
+            var targetPosition = _player.Position + amount;
+            _player.Position = targetPosition < TimeSpan.Zero ? TimeSpan.Zero : targetPosition;
+        }
     }
 }
