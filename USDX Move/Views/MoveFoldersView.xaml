@@ -1,0 +1,435 @@
+<UserControl x:Class="USDX_Move.Views.MoveFoldersView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="650" d:DesignWidth="900"
+             Background="#F4F6F9"
+             FontFamily="Segoe UI">
+
+    <UserControl.Resources>
+        <!-- Icons Geometry -->
+        <Geometry x:Key="FolderIconGeometry">M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z</Geometry>
+        <Geometry x:Key="ArrowRightGeometry">M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z</Geometry>
+        <Geometry x:Key="ArrowLeftGeometry">M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z</Geometry>
+        <Geometry x:Key="ClearGeometry">M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z</Geometry>
+        <Geometry x:Key="MoveGeometry">M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,13V9H15V13H18L14,17L10,13H13M13,3.5L18.5,9H13V3.5Z</Geometry>
+        <Geometry x:Key="BackArrowGeometry">M20,11H7.83L13.42,5.41L12,4L4,12L12,20L13.41,18.59L7.83,13H20V11Z</Geometry>
+        <Geometry x:Key="SearchGeometry">M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z</Geometry>
+
+        <!-- Common Button Style -->
+        <Style x:Key="BrowseButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#D0D5DD"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#EBF1FA"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#3B82F6"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#DCE7F6"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BackButtonElevationStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F1F5F9"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#CBD5E1"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#E2E8F0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.5"/>
+                                <Setter Property="Cursor" Value="Arrow"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TransferButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="46"/>
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#D0D5DD"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#3B82F6"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1D4ED8"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.4"/>
+                                <Setter Property="Cursor" Value="Arrow"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TextBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#D0D5DD"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,7"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#94A3B8"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#3B82F6"/>
+                                <Setter TargetName="border" Property="BorderThickness" Value="1.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ListBoxItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="Margin" Value="0,1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="0"
+                                CornerRadius="4">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#EBF1FA"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#DBEAFE"/>
+                                <Setter Property="Foreground" Value="#1E3A8A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Top Back Navigation Bar -->
+            <RowDefinition Height="Auto"/> <!-- Folder inputs -->
+            <RowDefinition Height="Auto"/> <!-- Action Buttons: Clear & Move -->
+            <RowDefinition Height="*"/>    <!-- Side by Side Lists -->
+            <RowDefinition Height="Auto"/> <!-- Status Bar -->
+        </Grid.RowDefinitions>
+
+        <!-- TOP NAVIGATION BAR -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="BtnBackToMenu" Style="{StaticResource BackButtonElevationStyle}" Click="BtnBackToMenu_Click" ToolTip="Return to Main Menu">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Path Data="{StaticResource BackArrowGeometry}" Fill="#475569" Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0"/>
+                    <TextBlock Text="Back to Menu" FontWeight="SemiBold" Foreground="#334155" FontSize="13"/>
+                </StackPanel>
+            </Button>
+
+            <TextBlock Grid.Column="1" Text="Move Folders Tool" FontSize="18" FontWeight="Bold" Foreground="#1E293B" VerticalAlignment="Center" Margin="16,0,0,0"/>
+        </Grid>
+
+        <!-- FOLDER INPUTS: From & To Folders -->
+        <Border Grid.Row="1" Background="#FFFFFF" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="12"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- From Folder -->
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="From Folder:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#334155" FontSize="13"/>
+                <TextBox x:Name="TxtFromFolder" Grid.Row="0" Grid.Column="1" Style="{StaticResource TextBoxStyle}" TextChanged="TxtFromFolder_TextChanged"/>
+                <Button x:Name="BtnBrowseFrom" Grid.Row="0" Grid.Column="3" Style="{StaticResource BrowseButtonStyle}" Click="BtnBrowseFrom_Click" ToolTip="Browse source folder">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Path Data="{StaticResource FolderIconGeometry}" Fill="#F59E0B" Width="18" Height="18" Stretch="Uniform" Margin="0,0,6,0"/>
+                        <TextBlock Text="Browse..." VerticalAlignment="Center" FontWeight="Medium" Foreground="#334155"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- To Folder -->
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="To Folder:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#334155" FontSize="13"/>
+                <TextBox x:Name="TxtToFolder" Grid.Row="2" Grid.Column="1" Style="{StaticResource TextBoxStyle}" TextChanged="TxtToFolder_TextChanged"/>
+                <Button x:Name="BtnBrowseTo" Grid.Row="2" Grid.Column="3" Style="{StaticResource BrowseButtonStyle}" Click="BtnBrowseTo_Click" ToolTip="Browse destination folder">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Path Data="{StaticResource FolderIconGeometry}" Fill="#3B82F6" Width="18" Height="18" Stretch="Uniform" Margin="0,0,6,0"/>
+                        <TextBlock Text="Browse..." VerticalAlignment="Center" FontWeight="Medium" Foreground="#334155"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- ACTION BUTTONS: Clear & Execute Move -->
+        <Grid Grid.Row="2" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Folder Selection" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold" Foreground="#1E293B"/>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <!-- Clear Selected List Button -->
+                <Button x:Name="BtnClearSelected" Style="{StaticResource ActionButtonStyle}" Background="#F1F5F9" Foreground="#475569" BorderBrush="#CBD5E1" BorderThickness="1" Margin="0,0,10,0" Click="BtnClearSelected_Click" ToolTip="Clear all items from the selected list">
+                    <StackPanel Orientation="Horizontal">
+                        <Path Data="{StaticResource ClearGeometry}" Fill="#64748B" Width="14" Height="14" Stretch="Uniform" Margin="0,0,6,0"/>
+                        <TextBlock Text="Clear Selection"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- Move Folders Button -->
+                <Button x:Name="BtnMove" Style="{StaticResource ActionButtonStyle}" Background="#2563EB" Foreground="#FFFFFF" BorderThickness="0" Click="BtnMove_Click" ToolTip="Move all selected folders to the destination folder">
+                    <StackPanel Orientation="Horizontal">
+                        <Path Data="{StaticResource MoveGeometry}" Fill="#FFFFFF" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0"/>
+                        <TextBlock Text="Move Folders"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- TWO LISTS SIDE BY SIDE -->
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: Source Folders List -->
+            <Border Grid.Column="0" Background="#FFFFFF" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/> <!-- Title & Count -->
+                        <RowDefinition Height="Auto"/> <!-- Search / Filter Box -->
+                        <RowDefinition Height="*"/>    <!-- List -->
+                        <RowDefinition Height="Auto"/> <!-- Tip -->
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0" Margin="0,0,0,8">
+                        <TextBlock Text="From Folder Contents" FontWeight="SemiBold" Foreground="#334155" FontSize="13" DockPanel.Dock="Left"/>
+                        <TextBlock x:Name="TxtSourceCount" Text="0 folders" Foreground="#64748B" FontSize="12" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                    </DockPanel>
+
+                    <!-- Filter Box -->
+                    <Grid Grid.Row="1" Margin="0,0,0,8">
+                        <TextBox x:Name="TxtFilter" Style="{StaticResource TextBoxStyle}" Padding="28,6,26,6" FontSize="12" TextChanged="TxtFilter_TextChanged"/>
+                        
+                        <!-- Search Icon -->
+                        <Path Data="{StaticResource SearchGeometry}" Fill="#94A3B8" Width="13" Height="13" Stretch="Uniform"
+                              HorizontalAlignment="Left" VerticalAlignment="Center" Margin="9,0,0,0" IsHitTestVisible="False"/>
+                        
+                        <!-- Placeholder watermark when empty -->
+                        <TextBlock Text="Filter folders..." Foreground="#94A3B8" FontSize="12" VerticalAlignment="Center" Margin="29,0,0,0" IsHitTestVisible="False">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=TxtFilter}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <!-- Clear filter button when not empty -->
+                        <Button x:Name="BtnClearFilter" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,6,0"
+                                Background="Transparent" BorderThickness="0" Cursor="Hand" Click="BtnClearFilter_Click" ToolTip="Clear filter">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=TxtFilter}" Value="">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <Path Data="{StaticResource ClearGeometry}" Fill="#94A3B8" Width="10" Height="10" Stretch="Uniform"/>
+                        </Button>
+                    </Grid>
+
+                    <ListBox x:Name="LstSourceFolders" Grid.Row="2" SelectionMode="Extended" 
+                             ItemContainerStyle="{StaticResource ListBoxItemStyle}"
+                             BorderThickness="1" BorderBrush="#E2E8F0"
+                             MouseDoubleClick="LstSourceFolders_MouseDoubleClick">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" ToolTip="{Binding RelativePath}">
+                                    <Path Data="{StaticResource FolderIconGeometry}" Fill="#F59E0B" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontSize="13" Foreground="#1E293B"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <TextBlock Grid.Row="3" Text="Tip: Double-click or select and click &gt; to choose" Foreground="#94A3B8" FontSize="11" Margin="0,6,0,0"/>
+                </Grid>
+            </Border>
+
+            <!-- Center Transfer Buttons -->
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <!-- Add to Right Button -->
+                <Button x:Name="BtnAdd" Style="{StaticResource TransferButtonStyle}" Margin="0,0,0,12" Click="BtnAdd_Click" ToolTip="Add selected folder(s) to move list">
+                    <Path Data="{StaticResource ArrowRightGeometry}" Fill="#334155" Width="18" Height="18" Stretch="Uniform"/>
+                </Button>
+
+                <!-- Remove from Right Button -->
+                <Button x:Name="BtnRemove" Style="{StaticResource TransferButtonStyle}" Click="BtnRemove_Click" ToolTip="Remove selected folder(s) from move list">
+                    <Path Data="{StaticResource ArrowLeftGeometry}" Fill="#334155" Width="18" Height="18" Stretch="Uniform"/>
+                </Button>
+            </StackPanel>
+
+            <!-- Right: Selected Folders List -->
+            <Border Grid.Column="2" Background="#FFFFFF" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0" Margin="0,0,0,8">
+                        <TextBlock Text="Folders to Move" FontWeight="SemiBold" Foreground="#334155" FontSize="13" DockPanel.Dock="Left"/>
+                        <TextBlock x:Name="TxtSelectedCount" Text="0 folders" Foreground="#64748B" FontSize="12" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                    </DockPanel>
+
+                    <ListBox x:Name="LstSelectedFolders" Grid.Row="1" SelectionMode="Extended"
+                             ItemContainerStyle="{StaticResource ListBoxItemStyle}"
+                             BorderThickness="1" BorderBrush="#E2E8F0"
+                             MouseDoubleClick="LstSelectedFolders_MouseDoubleClick">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" ToolTip="{Binding RelativePath}">
+                                    <Path Data="{StaticResource FolderIconGeometry}" Fill="#3B82F6" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontSize="13" Foreground="#1E293B"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <TextBlock Grid.Row="2" Text="Tip: Double-click or select and click &lt; to remove" Foreground="#94A3B8" FontSize="11" Margin="0,6,0,0"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- BOTTOM STATUS BAR -->
+        <Border Grid.Row="4" Margin="0,14,0,0" Background="#FFFFFF" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="12,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock x:Name="TxtStatus" Text="Ready. Select a source and destination folder to begin." Foreground="#475569" FontSize="12" VerticalAlignment="Center"/>
+                <ProgressBar x:Name="ProgMove" Grid.Column="1" Width="150" Height="14" Visibility="Collapsed" IsIndeterminate="False" Margin="10,0,0,0"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
